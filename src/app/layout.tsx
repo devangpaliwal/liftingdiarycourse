@@ -31,7 +31,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ClerkProvider>
-          <header className="flex items-center justify-end px-6 py-3 border-b border-border">
+          <header className="flex items-center justify-end px-6 py-3 border-b border-border h-[52px]">
             <Show when="signed-out">
               <div className="flex items-center gap-2">
                 <SignInButton mode="modal">

@@ -4,7 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## IMPORTANT: Documentation First
 
-**Before generating any code, always check the `/docs` directory for relevant documentation.** This includes component specs, design decisions, API contracts, data models, or any other guidance that applies to the task at hand. Code must align with what is documented there.
+**Before generating any code, always check the `/docs` directory for relevant documentation.** This includes component specs, design decisions, API contracts, data models, or any other guidance that applies to the task at hand. Code must align with what is documented there. Refer following:
+
+- /docs/ui.md
+- /docs/data-fetching.md
 
 ## Commands
 
