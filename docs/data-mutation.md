@@ -107,6 +107,42 @@ export async function createWorkoutAction(input: CreateWorkoutInput) {
 
 ---
 
+## Redirects
+
+**Never call `redirect()` inside a server action.** Server actions must return a typed result to the caller. All navigation must be handled client-side after the action resolves.
+
+**Wrong:**
+
+```ts
+// ❌ Do not redirect inside a server action
+export async function createWorkoutAction(input: CreateWorkoutInput) {
+  // ...
+  await createWorkout(result.data);
+  redirect("/dashboard"); // ❌
+}
+```
+
+**Correct:**
+
+```ts
+// ✅ Return a result; let the client redirect
+export async function createWorkoutAction(input: CreateWorkoutInput) {
+  // ...
+  const workout = await createWorkout(result.data);
+  return { success: true, data: workout };
+}
+```
+
+```tsx
+// ✅ Client component handles the redirect
+const result = await createWorkoutAction(input);
+if (result.success) {
+  router.push("/dashboard");
+}
+```
+
+---
+
 ## Anti-patterns to Avoid
 
 - Calling Drizzle ORM directly from a server action
@@ -114,3 +150,4 @@ export async function createWorkoutAction(input: CreateWorkoutInput) {
 - Defining server actions in page/component files instead of `actions.ts`
 - Skipping Zod validation and trusting raw input
 - Throwing errors from server actions instead of returning typed error results
+- Calling `redirect()` inside a server action instead of returning a result and redirecting client-side
