@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -72,7 +73,12 @@ export default function WorkoutCalendar({ selectedDate, workouts }: Props) {
             <ul className="space-y-4">
               {workouts.map((workout) => (
                 <li key={workout.id} className="space-y-2">
-                  <p className="font-semibold">{workout.name}</p>
+                  <Link
+                    href={`/dashboard/workout/${workout.id}`}
+                    className="font-semibold hover:underline"
+                  >
+                    {workout.name}
+                  </Link>
                   {workout.exercises.map((exercise) => (
                     <div key={exercise.id} className="rounded-lg border p-3 space-y-1">
                       <p className="font-medium">{exercise.name}</p>
