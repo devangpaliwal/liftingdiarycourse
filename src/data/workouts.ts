@@ -94,6 +94,77 @@ export async function getWorkoutsByDate(date: Date) {
   }));
 }
 
+export async function getWorkoutById(workoutId: number) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const rows = await db
+    .select({
+      workoutId: workouts.id,
+      workoutName: workouts.name,
+      startedAt: workouts.startedAt,
+      workoutExerciseId: workoutExercises.id,
+      exerciseName: exercises.name,
+      setId: sets.id,
+      setNumber: sets.setNumber,
+      reps: sets.reps,
+      weightKg: sets.weightKg,
+    })
+    .from(workouts)
+    .leftJoin(workoutExercises, eq(workoutExercises.workoutId, workouts.id))
+    .leftJoin(exercises, eq(exercises.id, workoutExercises.exerciseId))
+    .leftJoin(sets, eq(sets.workoutExerciseId, workoutExercises.id))
+    .where(
+      and(
+        eq(workouts.id, workoutId),
+        eq(workouts.userId, userId)
+      )
+    );
+
+  if (rows.length === 0) return null;
+
+  const exerciseMap = new Map<
+    number,
+    {
+      id: number;
+      name: string;
+      sets: { id: number; setNumber: number; reps: number | null; weightKg: number | null }[];
+    }
+  >();
+
+  for (const row of rows) {
+    if (row.workoutExerciseId && row.exerciseName) {
+      if (!exerciseMap.has(row.workoutExerciseId)) {
+        exerciseMap.set(row.workoutExerciseId, {
+          id: row.workoutExerciseId,
+          name: row.exerciseName,
+          sets: [],
+        });
+      }
+      const exercise = exerciseMap.get(row.workoutExerciseId)!;
+
+      if (row.setId) {
+        exercise.sets.push({
+          id: row.setId,
+          setNumber: row.setNumber!,
+          reps: row.reps,
+          weightKg: row.weightKg,
+        });
+      }
+    }
+  }
+
+  return {
+    id: rows[0].workoutId,
+    name: rows[0].workoutName,
+    startedAt: rows[0].startedAt,
+    exercises: Array.from(exerciseMap.values()),
+  };
+}
+
 export async function createWorkout(name: string, date: Date) {
   const { userId } = await auth();
 
